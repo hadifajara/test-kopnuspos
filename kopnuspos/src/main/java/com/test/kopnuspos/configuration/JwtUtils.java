@@ -39,7 +39,7 @@ public class JwtUtils {
 				.claim("roles", authorities)
 				.setSubject(authentication.getName())
 				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION * 1000))
+				.setExpiration(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION))
 				.signWith(SignatureAlgorithm.HS512, SIGNING_KEY)
 				.compact();
 	}

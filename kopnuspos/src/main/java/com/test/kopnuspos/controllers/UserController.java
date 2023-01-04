@@ -1,13 +1,16 @@
 package com.test.kopnuspos.controllers;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,6 +34,7 @@ import com.test.kopnuspos.models.UserLogin;
 import com.test.kopnuspos.services.JobsService;
 import com.test.kopnuspos.services.UserService;
 
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
 @CrossOrigin(origins = "*")
@@ -51,7 +56,7 @@ public class UserController {
     private JobsService jobsService;
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<?> generateToken(HttpSession session, @RequestBody UserLogin userLogin) throws AuthenticationException {
+    public ResponseEntity<?> generateToken(HttpSession session,@Valid @RequestBody UserLogin userLogin) throws AuthenticationException {
 
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -67,7 +72,7 @@ public class UserController {
     }
 
     @RequestMapping(value="/register", method = RequestMethod.POST)
-    public User saveUser(@RequestBody UserDTO user){
+    public User saveUser(@Valid @RequestBody UserDTO user){
         return userService.save(user);
     }
 
@@ -116,5 +121,15 @@ public class UserController {
     	return new ResponseEntity<Object>("Delete Successfully", HttpStatus.OK);
     }
     
+//    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(value="/async")
+    public ResponseEntity<?> testAsync() throws InterruptedException{
+    	
+    	for (int i = 1; i <= 100; i++) {
+			userService.getTestLoop(i);
+		}
+    	
+    	return new ResponseEntity<Object>("RUN", HttpStatus.OK);
+    }
     
 }
